@@ -418,19 +418,36 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                 document.body.appendChild(link); // Required for FF
                 link.click();
               };
+
+              function removeItem(tmpLoc){
+                // remove in loc_data                      
+                var index   = get_index_from_loc_for_loc_data(tmpLoc)
+                loc_data.splice(index, 1);
+                // remove in loc_ids
+                index       = loc_ids.indexOf(tmpLoc)
+                loc_ids.splice(index, 1);
+
+                //remove in markers
+                // console.log(mapObj.markers)     
+                index = get_index_from_loc_for_markers(tmpLoc)
+                if (index!=-1){
+                  mapObj.removeMarker(mapObj.markers[index])
+                }
+                //remove the overlays
+                index = get_index_from_loc_for_overlays(tmpLoc)
+                if (index!=-1){
+                  mapObj.removeOverlay(mapObj.overlays[index])
+                }
+                      
+              }
               
               document.addEventListener('click',function(e){
                 if(e.target && e.target.className== 'removeTxt'){
                       var rowId   = e.target.parentElement.id
                       var tempArr = rowId.split('_')
                       var tmpLoc  = tempArr[3]
-                      // remove in loc_data                      
-                      var index   = get_index_from_loc(tmpLoc)
-                      loc_data.splice(index, 1);
-                      // remove in loc_ids
-                      index       = loc_ids.indexOf(tmpLoc)
-                      loc_ids.splice(index, 1);
-                                           
+                      removeItem(tmpLoc)
+                      //re-show the table
                       showTable()
                  }
              });
@@ -453,9 +470,30 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
 
               }
 
-              function get_index_from_loc(locId){
+              function get_index_from_loc_for_loc_data(locId){
                 for (var i = loc_data.length - 1; i >= 0; i--) {
                     if (loc_data[i][0] == locId){
+                      return i;
+                    }
+                }
+                return -1;
+              }
+
+              function get_index_from_loc_for_markers(locId){
+                for (var i = mapObj.markers.length - 1; i >= 0; i--) {
+                  let tmpLoc = mapObj.markers[i].title.split("LOC")[1]
+                    if (tmpLoc == locId){
+                      return i;
+                    }
+                }
+                return -1;
+              }
+
+              function get_index_from_loc_for_overlays(locId){
+                for (var i = mapObj.overlays.length - 1; i >= 0; i--) {
+                  let tmpLoc = mapObj.overlays[i].el.innerText.split("LOC")[1]
+                  console.log(tmpLoc)
+                    if (tmpLoc == locId){
                       return i;
                     }
                 }
@@ -497,10 +535,10 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         }
                         
                         m.marker = mapObj.addMarker({
-                          lat: lat,
-                          lng: lon,
-                          title: titleContent,
-                          details:'detailed text',
+                          lat      : lat,
+                          lng      : lon,
+                          title    : titleContent,
+                          details  :'detailed text',
                           draggable: true,
                           
                           dragend: function(event) {
@@ -511,9 +549,9 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                               mapObj.removeOverlay(m['overlay'])
                               //draw new overlay
                               m.overlay = mapObj.drawOverlay({
-                                lat: lat,
-                                lng: lon,
-                                content: overlayContent,
+                                lat           : lat,
+                                lng           : lon,
+                                content       : overlayContent,
                                 verticalOffset: -40
                               });
                               // m.marker.infoWindow.content = `<h4>DEV ${devId} LOC ${locId}</h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`
@@ -521,7 +559,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
 
                               //update log_data
                               var tmpLoc         = (m.marker.infoWindow.content).split(" ")[3]
-                              var index          = get_index_from_loc(tmpLoc)
+                              var index          = get_index_from_loc_for_loc_data(tmpLoc)
                               loc_data[index][3] = lat
                               loc_data[index][4] = lon
 
@@ -529,23 +567,32 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                               showTable()
 
                           },
-                          icon: sourceIcon,
+                          icon      : sourceIcon,
                           infoWindow: {
-                            content: `<h4>DEV ${devId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`,
+                            content : `<h4>DEV ${devId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`,
                             maxWidth: 120
-                          },
+                            },
                           dblclick: function(e){
+                            var tmpLoc         = (m.marker.infoWindow.content).split(" ")[3]
                             mapObj.removeMarker(m.marker)
+                            mapObj.removeOverlay(m.overlay)
+                            var index   = get_index_from_loc_for_loc_data(tmpLoc)
+                            loc_data.splice(index, 1);
+                            // remove in loc_ids
+                            index       = loc_ids.indexOf(tmpLoc)
+                            loc_ids.splice(index, 1);
+                            showTable();
+
                           }
 
                         });
 
                         m.overlay = mapObj.drawOverlay({
-                          lat: lat,
-                          lng: lon,
-                          content: overlayContent,
+                          lat                : lat,
+                          lng                : lon,
+                          content            : overlayContent,
                           // horizontalOffset: -40,
-                          verticalOffset: -40
+                          verticalOffset     : -40
                         });
 
                         // push data to array
