@@ -384,6 +384,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
               export2csv    = document.querySelector('#export2csv')
               mapDiv        = document.querySelector('#map')
               mapDiv.hidden = true
+              document.getElementById("locationId").value = 1
 
               showInMap.onclick = function(e){
                 dismissBtn = document.querySelector('.dismissButton')
@@ -492,7 +493,6 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
               function get_index_from_loc_for_overlays(locId){
                 for (var i = mapObj.overlays.length - 1; i >= 0; i--) {
                   let tmpLoc = mapObj.overlays[i].el.innerText.split("LOC")[1]
-                  console.log(tmpLoc)
                     if (tmpLoc == locId){
                       return i;
                     }
@@ -569,7 +569,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                           },
                           icon      : sourceIcon,
                           infoWindow: {
-                            content : `<h4>DEV ${devId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`,
+                            content : `<h4>DEV ${devId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div>`,
                             maxWidth: 120
                             },
                           dblclick: function(e){
@@ -600,6 +600,14 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         loc_ids.push(locId)
 
                         showTable()
+
+                        //update the location id to new non existing value
+                        do{
+                          locId++
+                          console.log(locId.toString(), loc_ids, loc_ids.includes(locId.toString())? "exists" : "not exists")
+
+                        }while(loc_ids.includes(locId.toString()))
+                        document.getElementById("locationId").value = locId
                       },
                       error: function(error) {
                         alert(`Error Code ${error.code} : ${error.message}`);
