@@ -11,19 +11,20 @@
     
     <style type="text/css">
         body {
-          padding: 0px;
-          margin: 0px;
+          padding    : 0px;
+          margin     : 0px;
           font-family: 'Open Sans', sans-serif;
         }
         
         .reveal{
-          display:block;
-          width:100%;
-          height: 400px
+          display: block;
+          width  : 100%;
+          height : 400px
         }
         #map {
-          width: 100%;
-          height: 400px;
+          width     : 100%;
+          height    : 400px;
+          margin-top: 15px;
         }
         .hidden{
           display:none;
@@ -32,55 +33,67 @@
             text-align: center;
         }
         .panel {
-          position: relative;
-          margin: 0 auto;
-          width: 200px;
-          /*height: 280px;*/
+          position  : relative;
+          margin    : 0 auto;
+          width     : 200px;
+          /*height  : 280px;*/
           background: #ffffff;
-          padding: 10px;
-          border: 1px solid #a0a0a0;
+          padding   : 10px;
+          border    : 1px solid #a0a0a0;
         }
         .row {
-            color: #607d8b;
+            color        : #607d8b;
             margin-bottom: 5px;
         }
         .button:hover:enabled {
             background-color: #78909c;
-            color: #ffffff;
+            color           : #ffffff;
 
         }
         .removeTxt:hover {
-            color: #FFFFFF;
+            color           : #FFFFFF;
             background-color: #A6130E;
         }
         .textBox {
-            width: 199px;
+            width : 199px;
             height: 20px;
         }
         .button {
-            width: 199px;
-            height: 25px;
+            width           : 199px;
+            height          : 25px;
             background-color: #ffffff;
-            color: #78909c;
-            border: 1px solid #78909c;
+            color           : #78909c;
+            border          : 1px solid #78909c;
         }
         #table{
-          margin: 0 auto;
-          max-width : 1024px;
+          margin   : 0 auto;
+          max-width: 1024px;
         }
         #table table{
-          margin-top: 15px;
-          margin-left: 10px;
-          padding: 15px;
-          width: 80%;
+          margin-top     : 15px;
+          margin-left    : 10px;
+          padding        : 15px;
+          width          : 80%;
           border-collapse: collapse;
         }
-        tr:nth-child(even){background-color: #f2f2f2}
+
+        tr:nth-child(even){background-color: #FAEBD7}
+
         .removeTxt{
-          cursor:pointer;
+          cursor         :pointer;
           text-decoration: underline;
-          color:#A6130E;
+          color          :#A6130E;
         }
+
+        .overlay{
+          background   : rgba(75, 116, 156,0.75);
+          border       : solid 1px #336699;
+          border-radius: 4px;
+          box-shadow   : 2px 2px 10px #333;
+          padding      : 3px;
+          color        : white;
+        }
+
 
     </style>
     <!-- <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans"> -->
@@ -351,12 +364,12 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
     <!-- <script src="script.js"></script> -->
     <script type="text/javascript">
       
-              var sourceIcon = 's.png', destinationIcon = 'd.png';
-              var strokeColor = '#131540';
+              var sourceIcon    = 's.png', destinationIcon = 'd.png';
+              var strokeColor   = '#131540';
               var strokeOpacity = 0.6;
-              var strokeWeight = 6;
-              loc_data = []
-              loc_ids = []
+              var strokeWeight  = 6;
+              loc_data          = []
+              loc_ids           = []
 
               var mapObj = new GMaps({
                 el: '#map',
@@ -365,12 +378,12 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                 zoom: 15,
               });
 
-              loc_button = document.getElementById("loc_button");
-              showInMap = document.querySelector('#showInMap')
-              tableData = document.getElementById("tableContents")
-              export2csv = document.querySelector('#export2csv')
-              mapDiv = document.querySelector('#map')
-              mapDiv.hidden=true
+              loc_button    = document.getElementById("loc_button");
+              showInMap     = document.querySelector('#showInMap')
+              tableData     = document.getElementById("tableContents")
+              export2csv    = document.querySelector('#export2csv')
+              mapDiv        = document.querySelector('#map')
+              mapDiv.hidden = true
 
               showInMap.onclick = function(e){
                 dismissBtn = document.querySelector('.dismissButton')
@@ -391,16 +404,16 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
 
               export2csv.onclick = function(btn){
                 let csvContent = "data:text/csv;charset=utf-8,";
-                devId = document.getElementById("deviceId").value
-                csvContent +="Location,Device ID,StartTime,Latitude,Longitude,Altitude\r\n"
+                devId          = document.getElementById("deviceId").value
+                csvContent     += "Location,Device ID,StartTime,Latitude,Longitude,Altitude\r\n"
                 loc_data.forEach(function(rowArray) {
-                    let row = rowArray.join(",");
+                    let row    = rowArray.join(",");
                     csvContent += row + "\r\n";
                 });
                 var encodedUri = encodeURI(csvContent);
-                var link = document.createElement("a");
+                var link       = document.createElement("a");
+                var filename   = `${devId}_loc_time.csv`
                 link.setAttribute("href", encodedUri);
-                var filename = `${devId}_loc_time.csv`
                 link.setAttribute("download", filename);
                 document.body.appendChild(link); // Required for FF
                 link.click();
@@ -408,14 +421,14 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
               
               document.addEventListener('click',function(e){
                 if(e.target && e.target.className== 'removeTxt'){
-                      var rowId = e.target.parentElement.id
+                      var rowId   = e.target.parentElement.id
                       var tempArr = rowId.split('_')
-                      var tmpLoc = tempArr[3]
+                      var tmpLoc  = tempArr[3]
                       // remove in loc_data                      
-                      var index = get_index_from_loc(tmpLoc)
+                      var index   = get_index_from_loc(tmpLoc)
                       loc_data.splice(index, 1);
                       // remove in loc_ids
-                      index = loc_ids.indexOf(tmpLoc)
+                      index       = loc_ids.indexOf(tmpLoc)
                       loc_ids.splice(index, 1);
                                            
                       showTable()
@@ -450,13 +463,16 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
               }
               
               loc_button.onclick = function(e){
+
                 var lat = lon = alt = 0
-                locId     = document.getElementById("locationId").value.trim()
-                devId     = document.getElementById("deviceId").value.trim()
+                locId   = document.getElementById("locationId").value.trim()
+                devId   = document.getElementById("deviceId").value.trim()
+
                 if (!locId || ! devId){
                   alert("Device Id/Location Id cannot be EMPTY.")
                   return false
                 }
+
                 GMaps.geolocate({
 
                       success: function(position) {
@@ -464,7 +480,12 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         lon       = position.coords.longitude
                         alt       = position.coords.altitude
                         timestamp = position.timestamp
-                        
+                        var m = {
+                          'marker':new Object(),
+                          'overlay' : new Object()
+                        }
+                        var overlayContent = `<div class="overlay">DEV ${devId} LOC${locId}</div>`
+                        var titleContent = `DEV ${devId} LOC${locId}`
 
                         mapObj.setCenter(lat, lon);
                         mapObj.setZoom(16);
@@ -475,26 +496,56 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                           return
                         }
                         
-                        var m = mapObj.addMarker({
+                        m.marker = mapObj.addMarker({
                           lat: lat,
                           lng: lon,
-                          title: 'Eiffel Tower',
+                          title: titleContent,
                           details:'detailed text',
                           draggable: true,
+                          
                           dragend: function(event) {
                               var lat = event.latLng.lat();
-                              var lng = event.latLng.lng();
+                              var lon = event.latLng.lng();
+                              
+                              // remove old overlay location
+                              mapObj.removeOverlay(m['overlay'])
+                              //draw new overlay
+                              m.overlay = mapObj.drawOverlay({
+                                lat: lat,
+                                lng: lon,
+                                content: overlayContent,
+                                verticalOffset: -40
+                              });
+                              // m.marker.infoWindow.content = `<h4>DEV ${devId} LOC ${locId}</h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`
+                              // m.marker.infoWindow="dragged finished"
+
+                              //update log_data
+                              var tmpLoc         = (m.marker.infoWindow.content).split(" ")[3]
+                              var index          = get_index_from_loc(tmpLoc)
+                              loc_data[index][3] = lat
+                              loc_data[index][4] = lon
+
+                              // update the table
+                              showTable()
 
                           },
                           icon: sourceIcon,
                           infoWindow: {
-                            content: `<h4>DEV ${devId} LOC${locId}</h4><div>Paris, France</div>`,
+                            content: `<h4>DEV ${devId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`,
                             maxWidth: 120
                           },
                           dblclick: function(e){
-                            mapObj.removeMarker(m)
+                            mapObj.removeMarker(m.marker)
                           }
 
+                        });
+
+                        m.overlay = mapObj.drawOverlay({
+                          lat: lat,
+                          lng: lon,
+                          content: overlayContent,
+                          // horizontalOffset: -40,
+                          verticalOffset: -40
                         });
 
                         // push data to array
@@ -510,6 +561,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         alert("Your browser does not support geolocation");
                       }
                 });
+
               };
 
 
