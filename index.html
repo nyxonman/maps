@@ -66,6 +66,7 @@
         }
         #table{
           margin: 0 auto;
+          max-width : 1024px;
         }
         #table table{
           margin-top: 15px;
@@ -450,6 +451,12 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
               
               loc_button.onclick = function(e){
                 var lat = lon = alt = 0
+                locId     = document.getElementById("locationId").value.trim()
+                devId     = document.getElementById("deviceId").value.trim()
+                if (!locId || ! devId){
+                  alert("Device Id/Location Id cannot be EMPTY.")
+                  return false
+                }
                 GMaps.geolocate({
 
                       success: function(position) {
@@ -457,8 +464,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         lon       = position.coords.longitude
                         alt       = position.coords.altitude
                         timestamp = position.timestamp
-                        locId     = document.getElementById("locationId").value
-                        devId     = document.getElementById("deviceId").value
+                        
 
                         mapObj.setCenter(lat, lon);
                         mapObj.setZoom(16);
