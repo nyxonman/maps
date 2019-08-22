@@ -396,14 +396,18 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
     <!-- <script src="script.js"></script> -->
     <script type="text/javascript">
       
-              var sourceIcon    = 's.png', destinationIcon = 'd.png';
-              var strokeColor   = '#131540';
-              var strokeOpacity = 0.6;
-              var strokeWeight  = 6;
-              loc_data          = []
-              loc_ids           = []
-              u_ids             = [] // txid-rxid-locid
-              fields            = ["U_ID", "Loc Id", "Tx Id", "Rx Id", "StartTime", "Latitude", "Longitude", "Altitude", "Action"]
+              var sourceIcon      = 's.png', destinationIcon = 'd.png';
+              var strokeColor     = '#131540';
+              var strokeOpacity   = 0.6;
+              var strokeWeight    = 6;
+              loc_data            = []
+              loc_ids             = []
+              u_ids               = [] // txid-rxid-locid
+              fields              = ["U_ID", "Loc Id", "Tx Id", "Rx Id", "StartTime", "Latitude", "Longitude", "Altitude", "Action"]
+              testTimePerLocation = (45 + (11 * 45) * 2 + 10) * 1000; //(first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
+              var timerId         = 0
+              var timerRunning    = false;
+              
 
               var mapObj = new GMaps({
                 el: '#map',
@@ -543,6 +547,13 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                 }
                 return -1;
               }
+
+              function testComplete(){
+                // audioComplete.play();
+                alert("Test Completed. You can now move to new location")
+                if (timerId) clearInterval(timerId);
+
+              }
               
               loc_button.onclick = function(e){
 
@@ -552,6 +563,14 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                 txId    = document.getElementById("txId").value.trim()
                 uId     = txId + "-" + rxId + "-" + locId // globally unique identification
 
+                /*In case the timer is running and the button is pressed, simply just stop the timer*/
+                if(timerRunning){
+                  clearInterval(timerId)
+                  timerRunning = false
+                  loc_button.value = "Start at your location"
+                  alert("Current timer Aborted. Test Incomplete. You may have to delete the last entry.")
+                  return
+                }
                 /*Sanity check on empty inputs*/
                 if (!locId || !rxId || !txId ){
                   alert("Location, Tx Id and Rx Id cannot be EMPTY.")
@@ -568,12 +587,34 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                 GMaps.geolocate({
 
                       success: function(position) {
-                        lat       = position.coords.latitude
-                        lon       = position.coords.longitude
-                        alt       = position.coords.altitude
-                        timestamp = position.timestamp // is current time in msecs
+                        
+                        lat            = position.coords.latitude
+                        lon            = position.coords.longitude
+                        alt            = position.coords.altitude
+                        timestamp      = position.timestamp // is current time in msecs
+                        var now        = (new Date().getTime());
+                        var expiryTime = now + testTimePerLocation   
+                        
+                        // create a timer to show the remaining time at the current location and show an alert when time is up
+                        timerId = setInterval(function(){ 
+                                  now         = (new Date().getTime());
+                                  var msecRem = Math.floor((expiryTime - now))
+                                  if(msecRem<=0) {
+                                    clearInterval(timerId)
+                                    timerRunning     = false
+                                    loc_button.value = "Start at your location"
+                                    alert("Test Completed. You can now move to next location.")
+                                    return
+                                  }
+                                  var minutes = Math.floor((msecRem % (1000 * 60 * 60)) / (1000 * 60));
+                                  var seconds = Math.floor((msecRem % (1000 * 60)) / 1000);
+                                  loc_button.value = `${minutes} mins ${seconds} secs `
+                                  timerRunning = true
+                        }, 1000);
+                        // setTimeout(testComplete, testTimePerLocation);
+
                         var m = {
-                          'marker' :new Object(),
+                          'marker' : new Object(),
                           'overlay': new Object()
                         }
                         var overlayContent = `<div class="overlay">RX ${rxId} LOC${locId}</div>`
@@ -660,12 +701,15 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         }while(loc_ids.includes(locId.toString()))
                         document.getElementById("locationId").value = locId
                       },
+
                       error: function(error) {
                         alert(`Error Code ${error.code} : ${error.message}`);
                       },
+
                       not_supported: function() {
                         alert("Your browser does not support geolocation");
                       },
+
                       options: {
                         enableHighAccuracy: true,
                         timeout: 10000,
