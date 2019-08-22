@@ -159,7 +159,7 @@
         <div id="table" style="overflow-x: auto" class="center">
           <table border=1>
             <thead>
-              <tr><th>U-ID</th><th>Location</th><th>Tx ID</th><th>Rx ID</th><th>StartTime</th><th>Latitude</th><th>Longitude</th><th>Altitude</th><th>Action</th></tr>
+              <tr><th>U-ID</th><th>Location</th><th>Tx ID</th><th>Rx ID</th><th>StartTime(ms)</th><th>Latitude</th><th>Longitude</th><th>Altitude</th><th>Action</th></tr>
             </thead>
             <tbody id="tableContents">
                 
@@ -571,7 +571,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         lat       = position.coords.latitude
                         lon       = position.coords.longitude
                         alt       = position.coords.altitude
-                        timestamp = position.timestamp
+                        timestamp = position.timestamp // is current time in msecs
                         var m = {
                           'marker' :new Object(),
                           'overlay': new Object()
