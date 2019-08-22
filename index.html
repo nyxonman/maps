@@ -573,11 +573,11 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         alt       = position.coords.altitude
                         timestamp = position.timestamp
                         var m = {
-                          'marker':new Object(),
-                          'overlay' : new Object()
+                          'marker' :new Object(),
+                          'overlay': new Object()
                         }
                         var overlayContent = `<div class="overlay">RX ${rxId} LOC${locId}</div>`
-                        var titleContent = `RX ${rxId} LOC${locId}`
+                        var titleContent   = `RX ${rxId} LOC${locId}`
 
                         mapObj.setCenter(lat, lon);
                         mapObj.setZoom(16);
@@ -597,11 +597,11 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                               mapObj.removeOverlay(m['overlay'])
                               //draw new overlay
                               m.overlay = mapObj.drawOverlay({
-                                lat           : lat,
-                                lng           : lon,
-                                content       : overlayContent,
-                                verticalOffset: -40
-                              });
+                                            lat           : lat,
+                                            lng           : lon,
+                                            content       : overlayContent,
+                                            verticalOffset: -40
+                                          });
                               // m.marker.infoWindow.content = `<h4>DEV ${rxId} LOC ${locId}</h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`
                               // m.marker.infoWindow="dragged finished"
 
@@ -617,11 +617,11 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                           },
                           icon      : sourceIcon,
                           infoWindow: {
-                            content : `<h4>Rx ${rxId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div>`,
-                            maxWidth: 120
-                            },
+                                        content : `<h4>Rx ${rxId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div>`,
+                                        maxWidth: 120
+                                      },
                           dblclick: function(e){
-                            var tmpLoc         = (m.marker.infoWindow.content).split(" ")[3]
+                            var tmpLoc = (m.marker.infoWindow.content).split(" ")[3]
                             var result = confirm(`Do you confirm to remove LOC ${tmpLoc}`);
                             if (!result) {
                                 return;
@@ -640,12 +640,11 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         });
 
                         m.overlay = mapObj.drawOverlay({
-                          lat                : lat,
-                          lng                : lon,
-                          content            : overlayContent,
-                          // horizontalOffset: -40,
-                          verticalOffset     : -40
-                        });
+                                      lat           : lat,
+                                      lng           : lon,
+                                      content       : overlayContent,
+                                      verticalOffset: -40
+                                    });
 
                         // push data to array
                         loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, alt])
@@ -666,6 +665,11 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                       },
                       not_supported: function() {
                         alert("Your browser does not support geolocation");
+                      },
+                      options: {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
                       }
                 });
 
