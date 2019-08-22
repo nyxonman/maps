@@ -15,6 +15,11 @@
           margin     : 0px;
           font-family: 'Open Sans', sans-serif;
         }
+
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
         
         .reveal{
           display: block;
@@ -33,7 +38,7 @@
             text-align: center;
         }
         .panel {
-          position  : relative;
+          /*position  : relative;*/
           margin    : 0 auto;
           width     : 200px;
           /*height  : 280px;*/
@@ -44,19 +49,30 @@
         .row {
             color        : #607d8b;
             margin-bottom: 5px;
+            width: 100%;
+        }
+        .col-6{
+          width:45%;
+          float:left;
+          padding-right:5px;
         }
         .button:hover:enabled {
             background-color: #78909c;
             color           : #ffffff;
-
         }
         .removeTxt:hover {
             color           : #FFFFFF;
             background-color: #A6130E;
         }
         .textBox {
-            width : 199px;
+            width : 90%;
             height: 20px;
+            border: 1px solid #78909c;
+        }
+        .textBox:focus{
+           outline: none;
+            border-color: #9ecaed;
+            box-shadow: 0 0 5px #9ecaed;
         }
         .button {
             width           : 199px;
@@ -73,10 +89,12 @@
           margin-top     : 15px;
           margin-left    : 10px;
           padding        : 15px;
-          width          : 80%;
+          width          : 98%;
           border-collapse: collapse;
         }
-
+        #table table .tableRow:hover {
+            background: #ADD8E6;
+        }
         tr:nth-child(even){background-color: #FAEBD7}
 
         .removeTxt{
@@ -99,46 +117,60 @@
     <!-- <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans"> -->
   </head>
   <body>
-    <div class="panel">
-          <div class="row center" style="font-size: 20px;">
-            Tepco Locate Points
-          </div>
-          <div class="row">
-            <label for="deviceId"><span style="font-size: 13px;">Enter Device Id:</span></label>
-            <input type="text" id="deviceId" class="textBox">
-          </div>
-          <div class="row">
-            <label for="locationId"><span style="font-size: 13px;">Enter location:</span></label>
-            <input type="text" id="locationId" class="textBox">
-          </div>
-         
-          <div class="row">
-            <input type="button" value="Start at your location" id="loc_button" class="button">
-          </div>
-          <div class="row">
-            <input type="button" value="Show in Map" id="showInMap" class="button">
-          </div>
-          <div class="row">
-            <input type="button" value="Export to CSV" id="export2csv" class="button">
-          </div>
-      
-    </div>
+    <div class="container">
 
-    <div id="map"></div>
+        <div class="panel">
+              
+              <div class="row center" style="font-size: 20px;">
+                Tepco Locate Points
+              </div>
 
-    <div id="table" style="overflow-x: auto" class="center">
-      <table border=1>
-        <thead>
-          <tr><th>Location</th><th>Device ID</th><th>StartTime</th><th>Latitude</th><th>Longitude</th><th>Altitude</th><th>Action</th>
-        </thead>
-        <tbody id="tableContents">
+              <div class="row">
+                <div class="col-6">
+                    <label for="rxId"><span style="font-size: 13px;">Rx Id:</span></label>
+                    <input type="text" id="rxId" class="textBox" placeholder="RX device id">
+                </div>
+
+                <div class="col-6">
+                    <label for="txId"><span style="font-size: 13px;">Tx Id:</span></label>
+                    <input type="text" id="txId" class="textBox" placeholder="TX device id">
+                </div>
+                
+              </div>
+              <div class="row">
+                <label for="locationId"><span style="font-size: 13px;">Location:</span></label>
+                <input type="text" id="locationId" class="textBox">
+              </div>
+             
+              <div class="row">
+                <input type="button" value="Start at your location" id="loc_button" class="button">
+              </div>
+              <div class="row">
+                <input type="button" value="Show in Map" id="showInMap" class="button">
+              </div>
+              <div class="row">
+                <input type="button" value="Export to CSV" id="export2csv" class="button">
+              </div>
+          
+        </div> <!-- panel -->
+
+        <div id="map"></div>
+
+        <div id="table" style="overflow-x: auto" class="center">
+          <table border=1>
+            <thead>
+              <tr><th>U-ID</th><th>Location</th><th>Tx ID</th><th>Rx ID</th><th>StartTime</th><th>Latitude</th><th>Longitude</th><th>Altitude</th><th>Action</th></tr>
+            </thead>
+            <tbody id="tableContents">
+                
+            </tbody>
+            <tfoot id="foot">
+            </tfoot>
             
-        </tbody>
-        <tfoot id="foot">
-        </tfoot>
-        
-      </table>
-    </div>
+          </table>
+        </div> <!-- table -->
+
+    </div> <!-- container -->
     
 
 
@@ -370,11 +402,13 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
               var strokeWeight  = 6;
               loc_data          = []
               loc_ids           = []
+              u_ids             = [] // txid-rxid-locid
+              fields            = ["U_ID", "Loc Id", "Tx Id", "Rx Id", "StartTime", "Latitude", "Longitude", "Altitude", "Action"]
 
               var mapObj = new GMaps({
                 el: '#map',
-                lat: 41.8902421,
-                lng: 12.4924991,
+                lat: 35.652832,
+                lng: 139.839478,
                 zoom: 15,
               });
 
@@ -405,15 +439,16 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
 
               export2csv.onclick = function(btn){
                 let csvContent = "data:text/csv;charset=utf-8,";
-                devId          = document.getElementById("deviceId").value
-                csvContent     += "Location,Device ID,StartTime,Latitude,Longitude,Altitude\r\n"
+                rxId          = document.getElementById("rxId").value
+               
+                csvContent     += fields.join(",") + "\r\n"
                 loc_data.forEach(function(rowArray) {
                     let row    = rowArray.join(",");
                     csvContent += row + "\r\n";
                 });
                 var encodedUri = encodeURI(csvContent);
                 var link       = document.createElement("a");
-                var filename   = `${devId}_loc_time.csv`
+                var filename   = `${rxId}_loc_time.csv`
                 link.setAttribute("href", encodedUri);
                 link.setAttribute("download", filename);
                 document.body.appendChild(link); // Required for FF
@@ -445,8 +480,12 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
               document.addEventListener('click',function(e){
                 if(e.target && e.target.className== 'removeTxt'){
                       var rowId   = e.target.parentElement.id
-                      var tempArr = rowId.split('_')
-                      var tmpLoc  = tempArr[3]
+                      var tempArr = rowId.split('-')
+                      var tmpLoc  = tempArr[2]
+                      if(!tmpLoc) {
+                        alert(`Unknown locId ${tmpLoc}`)
+                        return
+                      }
                       var result = confirm(`Do you confirm to remove LOC ${tmpLoc}`);
                       if (result) {
                         removeItem(tmpLoc)
@@ -459,13 +498,15 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
               function showTable(){
                 let myHtml = "";
                 loc_data.forEach(function(rowArray){
-                  myHtml += `<tr class="tableRow" id="d_${rowArray[1]}_l_${rowArray[0]}">
+                  myHtml += `<tr class="tableRow" id="${rowArray[0]}">
                                   <td>${rowArray[0]}</td>
                                   <td>${rowArray[1]}</td>
                                   <td>${rowArray[2]}</td>
                                   <td>${rowArray[3]}</td>
                                   <td>${rowArray[4]}</td>
                                   <td>${rowArray[5]}</td>
+                                  <td>${rowArray[6]}</td>
+                                  <td>${rowArray[7]}</td>
                                   <td class="removeTxt">Remove</td>
                               </tr>`
                     
@@ -476,7 +517,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
 
               function get_index_from_loc_for_loc_data(locId){
                 for (var i = loc_data.length - 1; i >= 0; i--) {
-                    if (loc_data[i][0] == locId){
+                    if (loc_data[i][1] == locId){
                       return i;
                     }
                 }
@@ -507,11 +548,21 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
 
                 var lat = lon = alt = 0
                 locId   = document.getElementById("locationId").value.trim()
-                devId   = document.getElementById("deviceId").value.trim()
+                rxId    = document.getElementById("rxId").value.trim()
+                txId    = document.getElementById("txId").value.trim()
+                uId     = txId + "-" + rxId + "-" + locId // globally unique identification
 
-                if (!locId || ! devId){
-                  alert("Device Id/Location Id cannot be EMPTY.")
+                /*Sanity check on empty inputs*/
+                if (!locId || !rxId || !txId ){
+                  alert("Location, Tx Id and Rx Id cannot be EMPTY.")
                   return false
+                }
+
+                /*Sanity check on repeated loc_ids*/
+                if(loc_ids.includes(locId)){
+                  alert(`location Id '${locId}' already exists`)
+                  console.log(`location Id '${locId}' already exists`)
+                  return
                 }
 
                 GMaps.geolocate({
@@ -525,18 +576,12 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                           'marker':new Object(),
                           'overlay' : new Object()
                         }
-                        var overlayContent = `<div class="overlay">DEV ${devId} LOC${locId}</div>`
-                        var titleContent = `DEV ${devId} LOC${locId}`
+                        var overlayContent = `<div class="overlay">RX ${rxId} LOC${locId}</div>`
+                        var titleContent = `RX ${rxId} LOC${locId}`
 
                         mapObj.setCenter(lat, lon);
                         mapObj.setZoom(16);
 
-                        if(loc_ids.includes(locId)){
-                          alert(`location Id '${locId}' already exists`)
-                          console.log(`location Id '${locId}' already exists`)
-                          return
-                        }
-                        
                         m.marker = mapObj.addMarker({
                           lat      : lat,
                           lng      : lon,
@@ -557,14 +602,14 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                                 content       : overlayContent,
                                 verticalOffset: -40
                               });
-                              // m.marker.infoWindow.content = `<h4>DEV ${devId} LOC ${locId}</h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`
+                              // m.marker.infoWindow.content = `<h4>DEV ${rxId} LOC ${locId}</h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(3)}, ${parseFloat(lon).toFixed(3)}</div>`
                               // m.marker.infoWindow="dragged finished"
 
                               //update log_data
                               var tmpLoc         = (m.marker.infoWindow.content).split(" ")[3]
                               var index          = get_index_from_loc_for_loc_data(tmpLoc)
-                              loc_data[index][3] = lat
-                              loc_data[index][4] = lon
+                              loc_data[index][5] = lat
+                              loc_data[index][6] = lon
 
                               // update the table
                               showTable()
@@ -572,7 +617,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                           },
                           icon      : sourceIcon,
                           infoWindow: {
-                            content : `<h4>DEV ${devId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div>`,
+                            content : `<h4>Rx ${rxId} LOC ${locId} </h4><div>Paris, France</div><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div>`,
                             maxWidth: 120
                             },
                           dblclick: function(e){
@@ -603,7 +648,7 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                         });
 
                         // push data to array
-                        loc_data.push([locId,devId, timestamp, lat, lon, alt])
+                        loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, alt])
                         loc_ids.push(locId)
 
                         showTable()
