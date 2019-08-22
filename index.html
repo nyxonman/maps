@@ -447,9 +447,12 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                       var rowId   = e.target.parentElement.id
                       var tempArr = rowId.split('_')
                       var tmpLoc  = tempArr[3]
-                      removeItem(tmpLoc)
-                      //re-show the table
-                      showTable()
+                      var result = confirm(`Do you confirm to remove LOC ${tmpLoc}`);
+                      if (result) {
+                        removeItem(tmpLoc)
+                        //re-show the table
+                        showTable()                         
+                      }
                  }
              });
 
@@ -574,6 +577,10 @@ TransitLayer:Ef,TransitMode:_.Zi,TransitRoutePreference:_.$i,TravelMode:_.Xi,Uni
                             },
                           dblclick: function(e){
                             var tmpLoc         = (m.marker.infoWindow.content).split(" ")[3]
+                            var result = confirm(`Do you confirm to remove LOC ${tmpLoc}`);
+                            if (!result) {
+                                return;
+                            }
                             mapObj.removeMarker(m.marker)
                             mapObj.removeOverlay(m.overlay)
                             var index   = get_index_from_loc_for_loc_data(tmpLoc)
