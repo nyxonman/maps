@@ -195,8 +195,9 @@
               testTimePerLocation = (45 + (11 * 45) * 2 + 10) * 1000; //(first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
               var timerId         = 0
               var timerRunning    = false;
+              var testCompleteAudio = new Audio("./completed.mp3")
+              // console.log(testCompleteAudio);
               
-
               var mapObj = new GMaps({
                 el: '#map',
                 lat: 35.689487,
@@ -391,7 +392,9 @@
                                     clearInterval(timerId)
                                     timerRunning     = false
                                     loc_button.value = "Start at your location"
+                                    testCompleteAudio.play()
                                     alert("Test Completed. You can now move to next location.")
+
                                     return
                                   }
                                   var minutes = Math.floor((msecRem % (1000 * 60 * 60)) / (1000 * 60));
