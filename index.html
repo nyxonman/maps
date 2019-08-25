@@ -378,7 +378,9 @@
                         acc            = position.coords.accuracy // in meters, bigger the number lesser the accuracy
                         timestamp      = position.timestamp // is current time in msecs
                         var now        = (new Date().getTime());
-                        var expiryTime = now + testTimePerLocation   
+                        var expiryTime = now + testTimePerLocation
+                        var expiryTime = now + 10000
+
                         
                         // create a timer to show the remaining time at the current location and show an alert when time is up
                         timerId = setInterval(function(){ 
