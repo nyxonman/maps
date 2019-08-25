@@ -55,6 +55,7 @@
           width:45%;
           float:left;
           padding-right:5px;
+          margin-bottom: 5px;
         }
         .button:hover:enabled {
             background-color: #78909c;
@@ -138,8 +139,14 @@
                 
               </div>
               <div class="row">
-                <label for="locationId"><span style="font-size: 13px;">Location:</span></label>
-                <input type="text" id="locationId" class="textBox">
+                <div class="col-6">
+                  <label for="locationId"><span style="font-size: 13px;">Location:</span></label>
+                  <input type="text" id="locationId" class="textBox">
+                </div>
+                <div class="col-6">
+                  <label for="testRuns"><span style="font-size: 13px;">Test Runs:</span></label>
+                  <input type="text" id="testRuns" class="textBox" value="1">
+                </div>
               </div>
              
               <div class="row">
@@ -159,7 +166,7 @@
         <div id="table" style="overflow-x: auto" class="center">
           <table border=1>
             <thead>
-              <tr><th nowrap>U-ID</th><th nowrap>Location</th><th nowrap>Tx ID</th><th nowrap>Rx ID</th><th nowrap>StartTime(ms)</th><th nowrap>Latitude</th><th nowrap>Longitude</th><th nowrap>Accuracy(in m)</th><th nowrap>Altitude</th><th nowrap>Action</th></tr>
+              <tr><th nowrap>U-ID</th><th nowrap>Location</th><th nowrap>Tx ID</th><th nowrap>Rx ID</th><th nowrap>StartTime(ms)</th><th nowrap>Latitude</th><th nowrap>Longitude</th><th nowrap>Accuracy(in m)</th><th nowrap>Altitude</th><th nowrap>Test Reps</th><th nowrap>Action</th></tr>
             </thead>
             <tbody id="tableContents">
                 
@@ -184,17 +191,17 @@
     <!-- <script src="script.js"></script> -->
     <script type="text/javascript">
       
-              var sourceIcon      = 's.png', destinationIcon = 'd.png';
-              var strokeColor     = '#131540';
-              var strokeOpacity   = 0.6;
-              var strokeWeight    = 6;
-              loc_data            = []
-              loc_ids             = []
-              u_ids               = [] // txid-rxid-locid
-              fields              = ["U_ID", "Loc Id", "Tx Id", "Rx Id", "StartTime", "Latitude", "Longitude", "Altitude", "Accuracy", "Action"]
-              testTimePerLocation = (45 + (11 * 45) * 2 + 10) * 1000; //(first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
-              var timerId         = 0
-              var timerRunning    = false;
+              var sourceIcon        = 's.png', destinationIcon = 'd.png';
+              var strokeColor       = '#131540';
+              var strokeOpacity     = 0.6;
+              var strokeWeight      = 6;
+              loc_data              = []
+              loc_ids               = []
+              u_ids                 = [] // txid-rxid-locid
+              fields                = ["U_ID", "Loc Id", "Tx Id", "Rx Id", "StartTime", "Latitude", "Longitude",  "Accuracy", "Altitude", "Test Reps" ,"Action"]
+              testTime              = (11 * 45); //timeslotduration * number of channels
+              var timerId           = 0
+              var timerRunning      = false;
               var testCompleteAudio = new Audio("./completed.mp3")
               // console.log(testCompleteAudio);
               
@@ -342,11 +349,13 @@
               loc_button.onclick = function(e){
 
                 var lat = lon = alt = 0
-                locId   = document.getElementById("locationId").value.trim()
-                rxId    = document.getElementById("rxId").value.trim()
-                txId    = document.getElementById("txId").value.trim()
-                uId     = txId + "-" + rxId + "-" + locId // globally unique identification
-
+                locId    = document.getElementById("locationId").value.trim()
+                rxId     = document.getElementById("rxId").value.trim()
+                txId     = document.getElementById("txId").value.trim()
+                testRuns = Number(document.getElementById("testRuns").value.trim())
+                uId      = txId + "-" + rxId + "-" + locId // globally unique identification
+                var testTimePerLocation = testRuns? testTime * testRuns : testTime
+                testTimePerLocation = (45 + testTimePerLocation + 10)*1000 // (first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
                 /*In case the timer is running and the button is pressed, simply just stop the timer*/
                 if(timerRunning){
                   clearInterval(timerId)
@@ -379,8 +388,6 @@
                         timestamp      = position.timestamp // is current time in msecs
                         var now        = (new Date().getTime());
                         var expiryTime = now + testTimePerLocation
-                        var expiryTime = now + 10000
-
                         
                         // create a timer to show the remaining time at the current location and show an alert when time is up
                         timerId = setInterval(function(){ 
@@ -477,7 +484,7 @@
                                     });
 
                         // push data to array
-                        loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, acc, alt])
+                        loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, acc, alt, testRuns])
                         loc_ids.push(locId)
 
                         showTable()
