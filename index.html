@@ -159,7 +159,7 @@
         <div id="table" style="overflow-x: auto" class="center">
           <table border=1>
             <thead>
-              <tr><th>U-ID</th><th>Location</th><th>Tx ID</th><th>Rx ID</th><th>StartTime(ms)</th><th>Latitude</th><th>Longitude</th><th>Altitude</th><th>Action</th></tr>
+              <tr><th nowrap>U-ID</th><th nowrap>Location</th><th nowrap>Tx ID</th><th nowrap>Rx ID</th><th nowrap>StartTime(ms)</th><th nowrap>Latitude</th><th nowrap>Longitude</th><th nowrap>Altitude</th><th nowrap>Accuracy(in m)</th><th nowrap>Action</th></tr>
             </thead>
             <tbody id="tableContents">
                 
@@ -191,7 +191,7 @@
               loc_data            = []
               loc_ids             = []
               u_ids               = [] // txid-rxid-locid
-              fields              = ["U_ID", "Loc Id", "Tx Id", "Rx Id", "StartTime", "Latitude", "Longitude", "Altitude", "Action"]
+              fields              = ["U_ID", "Loc Id", "Tx Id", "Rx Id", "StartTime", "Latitude", "Longitude", "Altitude", "Accuracy", "Action"]
               testTimePerLocation = (45 + (11 * 45) * 2 + 10) * 1000; //(first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
               var timerId         = 0
               var timerRunning    = false;
@@ -290,19 +290,14 @@
 
               function showTable(){
                 let myHtml = "";
+                
                 loc_data.forEach(function(rowArray){
-                  myHtml += `<tr class="tableRow" id="${rowArray[0]}">
-                                  <td>${rowArray[0]}</td>
-                                  <td>${rowArray[1]}</td>
-                                  <td>${rowArray[2]}</td>
-                                  <td>${rowArray[3]}</td>
-                                  <td>${rowArray[4]}</td>
-                                  <td>${rowArray[5]}</td>
-                                  <td>${rowArray[6]}</td>
-                                  <td>${rowArray[7]}</td>
-                                  <td class="removeTxt">Remove</td>
-                              </tr>`
-                    
+                  myHtml += `<tr class="tableRow" id="${rowArray[0]}">`
+                  for (var i = 0; i < rowArray.length; i++) {
+                    myHtml += `<td>${rowArray[i]}</td>`
+                  }
+                  myHtml += "<td class='removeTxt'>Remove</td>"
+                  myHtml += "</tr>"
                 });
                 tableData.innerHTML = myHtml
 
@@ -380,6 +375,7 @@
                         lat            = position.coords.latitude
                         lon            = position.coords.longitude
                         alt            = position.coords.altitude
+                        acc            = position.coords.accuracy // in meters, bigger the number lesser the accuracy
                         timestamp      = position.timestamp // is current time in msecs
                         var now        = (new Date().getTime());
                         var expiryTime = now + testTimePerLocation   
@@ -479,7 +475,7 @@
                                     });
 
                         // push data to array
-                        loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, alt])
+                        loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, acc, alt])
                         loc_ids.push(locId)
 
                         showTable()
@@ -503,8 +499,8 @@
 
                       options: {
                         enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
+                        timeout: 10000, // the maximum time the user can wait for the response
+                        maximumAge: 0 // user agent must not used cached data
                       }
                 });
 
