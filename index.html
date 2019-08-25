@@ -358,10 +358,13 @@
                 testTimePerLocation = (45 + testTimePerLocation + 10)*1000 // (first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
                 /*In case the timer is running and the button is pressed, simply just stop the timer*/
                 if(timerRunning){
-                  clearInterval(timerId)
-                  timerRunning = false
-                  loc_button.value = "Start at your location"
-                  alert("Current timer Aborted. Test Incomplete. You may have to delete the last entry.")
+                  var res = confirm("Timer Running. Do you want to abort?")
+                  if (res){
+                    clearInterval(timerId)
+                    timerRunning = false
+                    loc_button.value = "Start at your location"
+                    alert("Current timer Aborted. Test Incomplete. You may have to delete the last entry.")
+                  }
                   return
                 }
                 /*Sanity check on empty inputs*/
