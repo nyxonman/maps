@@ -49,7 +49,7 @@
           width     : 200px;
           /*height  : 280px;*/
           background: #D6E7F1;
-          padding   : 10px;
+          padding   : 0 10px 10px 10px;
           border    : 1px solid #a0a0a0;
           box-shadow:  0px 0px 5px 5px rgba(54,58,69,1);
 
@@ -76,6 +76,7 @@
             width : 90%;
             height: 20px;
             border: 1px solid #78909c;
+            border-radius: 3px;
         }
         .textBox:focus{
            outline: none;
@@ -95,11 +96,8 @@
             padding: 6px 12px;
             border-radius: 4px;
         }
-        .button:hover:enabled {
-            background-color: #78909c;
-            color           : #ffffff;
-        }
-        #loc_button{
+        
+      /*  #loc_button{
           color: #fff;
           background-color: #337ab7;
           border-color: #2e6da4;
@@ -110,6 +108,30 @@
           color: #fff;
           background-color: #286090;
           border-color: #204d74;
+        }*/
+        .testNotStarted{
+          color: #fff;
+          background-color: #337ab7;
+          border-color: #2e6da4;
+          width: 100%;
+          margin-top: 6px;
+        }
+        .testNotStarted:hover{
+          color: #fff;
+          background-color: #286090;
+          border-color: #204d74;
+        }
+        .testStarted{
+          color: #fff;
+          background-color: #d9534f;
+          border-color: #d43f3a;
+          width: 100%;
+          margin-top: 6px;
+        }
+        .testStarted:hover{
+          color: #fff;
+          background-color: #c9302c;
+          border-color: #ac2925;
         }
         #showInMap{
           color: #fff;
@@ -132,9 +154,7 @@
           border-color: #d58512;
         }
         .testRunning{
-          color: #fff;
-          background-color: #d9534f;
-          border-color: #d43f3a;
+          
         }
         #table{
           margin   : 0 auto;
@@ -142,26 +162,19 @@
         }
         #table table{
           margin-top     : 15px;
-          /*margin-left    : 10px;*/
-          /*padding        : 15px;*/
           width          : 100%;
           border-collapse: collapse;
-          /*border-color: #00AD5F;*/
           border-color: #167F92;
           background: #FFFFFF;
-          /*color: #FFF;*/
 
         }
         table th, table td{
           padding: 7px;
-          /*border-color: #00AD5F;*/
           border:1px solid #D9E4E6;
-
-
         }
         table th{
           color: #FFF;
-          background: #167F92;
+          background: #008080;
         }
         table td{
           /*padding: 5px;*/
@@ -223,7 +236,7 @@
               </div>
              
               <div class="row">
-                <input type="button" value="Start at your location" id="loc_button" class="button">
+                <input type="button" value="Start at your location" id="loc_button" class="button testNotStarted">
               </div>
               
           
@@ -419,6 +432,14 @@
                 if (timerId) clearInterval(timerId);
 
               }
+
+              function resetTimer(timerId){
+                loc_button.classList.remove('testStarted')
+                loc_button.classList.add('testNotStarted')
+                clearInterval(timerId)
+                timerRunning = false
+                loc_button.value = "Start at your location"
+              }
               
               loc_button.onclick = function(e){
 
@@ -434,9 +455,7 @@
                 if(timerRunning){
                   var res = confirm("Timer Running. Do you want to abort?")
                   if (res){
-                    clearInterval(timerId)
-                    timerRunning = false
-                    loc_button.value = "Start at your location"
+                    resetTimer(timerId)
                     alert("Current timer Aborted. Test Incomplete. You may have to delete the last entry.")
                   }
                   return
@@ -471,9 +490,7 @@
                                   now         = (new Date().getTime());
                                   var msecRem = Math.floor((expiryTime - now))
                                   if(msecRem<=0) {
-                                    clearInterval(timerId)
-                                    timerRunning     = false
-                                    loc_button.value = "Start at your location"
+                                    resetTimer(timerId)
                                     testCompleteAudio.play()
                                     alert("Test Completed. You can now move to next location.")
 
@@ -481,10 +498,12 @@
                                   }
                                   var minutes = Math.floor((msecRem % (1000 * 60 * 60)) / (1000 * 60));
                                   var seconds = Math.floor((msecRem % (1000 * 60)) / 1000);
+          //                          
+                                  loc_button.classList.remove('testNotStarted')
+                                  loc_button.classList.add('testStarted')
                                   loc_button.value = `${minutes} mins ${seconds} secs `
                                   timerRunning = true
                         }, 1000);
-                        // setTimeout(testComplete, testTimePerLocation);
 
                         var m = {
                           'marker' : new Object(),
