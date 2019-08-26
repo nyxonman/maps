@@ -383,6 +383,15 @@
                  }
              });
 
+              function get_current_date(){
+                d = new Date().time()
+                myDate=""
+                console.log(d.getYear())
+                // myDate = date.getYear() + "-" + strdate.getMonth()+1 + "-" + date.getDay()
+                return myDate
+
+              }
+
               function showTable(){
                 let myHtml = "";
                 
@@ -482,7 +491,16 @@
                         lon            = position.coords.longitude
                         alt            = position.coords.altitude
                         acc            = position.coords.accuracy // in meters, bigger the number lesser the accuracy
-                        timestamp      = position.timestamp // is current time in msecs
+                        timestamp      = position.timestamp// is current time in msecs
+
+                        myDate = new Date(timestamp)
+                        // console.log(myDate.toLocaleString('en-GB', { timeZone: 'UTC' }))
+                        myDate = myDate.toLocaleString('en-GB', {  })
+                        splitted = myDate.split(',')
+                        dat = splitted[0].split('/')
+                        time = splitted[1].trim()
+                        timestamp = dat[2] + "-" + dat[1] + "-" + dat[0] + " " + time
+
                         var now        = (new Date().getTime());
                         var expiryTime = now + testTimePerLocation
                         
