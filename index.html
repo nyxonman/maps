@@ -217,7 +217,7 @@
         <div class="panel">
               
               <div class="row center" style="font-size: 20px;">
-                <div class="logo "><img src="./dlogo.png" alt="Itron"></div> <div class="header">GeoLocate</div>
+                <div class="logo "><img src="./logo.png" alt="Itron"></div> <div class="header">GeoLocate</div>
               </div>
 
               <div class="row">
@@ -335,8 +335,7 @@
               export2csv.onclick = function(btn){
                 let csvContent = "data:text/csv;charset=utf-8,";
                 rxId          = document.getElementById("rxId").value
-               
-                csvContent     += fields.join(",") + "\r\n"
+                csvContent     += (fields.slice(0,fields.length-1)).join(",") + "\r\n"
                 loc_data.forEach(function(rowArray) {
                     let row    = rowArray.join(",");
                     csvContent += row + "\r\n";
