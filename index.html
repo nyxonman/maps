@@ -507,6 +507,12 @@
                         time = splitted[1].trim()
                         timestamp = dat[2] + "-" + dat[1] + "-" + dat[0] + " " + time
 
+                         // push data to array
+                        loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, acc, alt, testRuns])
+                        loc_ids.push(locId)
+
+                        showTable()
+                        
                         var now        = (new Date().getTime());
                         var expiryTime = now + testTimePerLocation
                         
@@ -602,13 +608,7 @@
                                       lng           : lon,
                                       content       : overlayContent,
                                       verticalOffset: -40
-                                    });
-
-                        // push data to array
-                        loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, acc, alt, testRuns])
-                        loc_ids.push(locId)
-
-                        showTable()
+                                    });                       
 
                         //update the location id to new non existing value
                         do{
