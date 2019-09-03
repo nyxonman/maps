@@ -216,10 +216,15 @@
 			<div class="panel">
 				
 				<div class="row center" style="font-size: 20px;">
-					<div class="logo "><img src="./logo.png" alt="Itron"></div> <div class="header">GeoLocate</div>
+					<div class="logo "><img src="./logo.png" alt="Itron"></div> <div class="header">GeoLocate </div>
+					
 				</div>
-				<div class="row">
-					<div class="col-6">
+				<div class="row center radio-tx-rx">
+						<input type="radio" id= "radio-tx" name="radio-tx-rx" value="tx"> TX
+						<input type="radio" id="radio-rx" name="radio-tx-rx" value="rx" checked="checked"> RX
+					</div>
+				<div class="row" >
+					<div class="col-6" id="div-rxId">
 						<label for="rxId"><span style="font-size: 13px;">Rx Id:</span></label>
 						<input type="text" id="rxId" class="textBox" placeholder="RX device id">
 					</div>
@@ -234,7 +239,7 @@
 						<label for="locationId"><span style="font-size: 13px;">Location:</span></label>
 						<input type="text" id="locationId" class="textBox">
 					</div>
-					<div class="col-6">
+					<div class="col-6" id="div-testRuns">
 						<label for="testRuns"><span style="font-size: 13px;">Test Runs:</span></label>
 						<input type="text" id="testRuns" class="textBox" value="1">
 					</div>
@@ -255,7 +260,7 @@
 			<div id="table" style="overflow-x: auto" class="center">
 				<table border=1>
 					<thead>
-						<tr><th nowrap>U-ID</th><th nowrap>Location</th><th nowrap>Tx ID</th><th nowrap>Rx ID</th><th nowrap>StartTime(ms)</th><th nowrap>Latitude</th><th nowrap>Longitude</th><th nowrap>Accuracy(in m)</th><th nowrap>Altitude</th><th nowrap>Test Reps</th><th nowrap>Action</th></tr>
+						<tr><th nowrap>U-ID</th><th nowrap>Location</th><th nowrap>Tx ID</th><th nowrap>Rx ID</th><th nowrap>StartTime(ms)</th><th nowrap>Latitude</th><th nowrap>Longitude</th><th nowrap>Accuracy(in m)</th><th nowrap>Altitude</th><th nowrap>Test Reps</th><th nowrap>Entry for</th><th nowrap>Action</th></tr>
 					</thead>
 					<tbody id="tableContents">
 						
@@ -284,13 +289,37 @@
 			loc_data              = []
 			loc_ids               = []
 			u_ids                 = [] // txid-rxid-locid
-			fields                = ["U_ID", "Loc_id", "Tx_id", "Rx_id", "StartTime", "Latitude", "Longitude",  "Accuracy", "Altitude", "Test_reps" ,"Action"]
+			fields                = ["U_ID", "Loc_id", "Tx_id", "Rx_id", "StartTime", "Latitude", "Longitude",  "Accuracy", "Altitude", "Test_reps" ,"EntryFor", "Action"]
 			testTime              = (11 * 45); //timeslotduration * number of channels
 			var timerId           = 0
 			var timerRunning      = false;
+			var appInTx           = true
+			var lastrxId          = ""
+			var lasttestRuns      = ""
 			var testCompleteAudio = new Audio("./completed.mp3")
 		  // console.log(testCompleteAudio);
-		  
+		  	var txRadio = document.querySelector('#radio-tx');
+		  	var rxRadio = document.querySelector('#radio-rx');
+
+		  	rxRadio.checked = true
+
+			txRadio.addEventListener('change', (event) => {
+					console.log(event.target)
+					document.getElementById("rxId").value = ""
+					document.getElementById("testRuns").value =""
+					document.querySelector('#div-rxId').hidden = true
+					document.querySelector('#div-testRuns').hidden = true
+					appInTx = true
+			});
+			rxRadio.addEventListener('change', (event) => {
+					console.log(event.target)
+					document.querySelector('#div-rxId').hidden = false
+					document.querySelector('#div-testRuns').hidden = false
+					document.getElementById("rxId").value = lastrxId
+					document.getElementById("testRuns").value = lasttestRuns
+				  	appInTx = false
+			});
+
 			var mapObj = new GMaps({
 				el: '#map',
 				lat: 35.689487,
@@ -450,11 +479,13 @@
 			loc_button.onclick = function(e){
 
 				var lat = lon = alt = 0
-				locId    = document.getElementById("locationId").value.trim()
-				rxId     = document.getElementById("rxId").value.trim()
-				txId     = document.getElementById("txId").value.trim()
-				testRuns = Number(document.getElementById("testRuns").value.trim())
-				uId      = txId + "-" + rxId + "-" + locId // globally unique identification
+				locId        = document.getElementById("locationId").value.trim()
+				rxId         = document.getElementById("rxId").value.trim()
+				lastrxId     = rxId
+				txId         = document.getElementById("txId").value.trim()
+				testRuns     = Number(document.getElementById("testRuns").value.trim())
+				lasttestRuns = testRuns
+				uId          = txId + "-" + rxId + "-" + locId // globally unique identification
 				var testTimePerLocation = testRuns? testTime * testRuns : testTime
 				testTimePerLocation = (45 + testTimePerLocation + 10)*1000 // (first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
 				/*In case the timer is running and the button is pressed, simply just stop the timer*/
@@ -466,10 +497,17 @@
 				  }
 				  return
 				}
-				/*Sanity check on empty inputs*/
-				if (!locId || !rxId || !txId ){
-				  alert("Location, Tx Id and Rx Id cannot be EMPTY.")
+				/*Sanity check on empty inputs*/				
+				if (!locId || !txId ){
+				  alert("Location or Tx Id cannot be EMPTY.")
 				  return false
+				}
+				if (appInTx == false){
+					if(!rxId || !testRuns){
+						alert("Rx Id or test Runs cannot be EMPTY")
+						return false
+					}
+
 				}
 
 				/*Sanity check on repeated loc_ids*/
@@ -488,6 +526,7 @@
 						alt       = position.coords.altitude
 						acc       = position.coords.accuracy // in meters, bigger the number lesser the accuracy
 						timestamp = position.timestamp// is current time in msecs
+						entryFor  = appInTx? "tx" : "rx";
 
 						// console.log(myDate.toLocaleString('en-GB', { timeZone: 'UTC' }))
 						myDate    = new Date(timestamp)
@@ -498,16 +537,17 @@
 						timestamp = dat[2] + "-" + dat[1] + "-" + dat[0] + " " + time
 
 						 // push data to array
-						loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, acc, alt, testRuns])
+						loc_data.push([uId, locId, txId, rxId, timestamp, lat, lon, acc, alt, testRuns, entryFor])
 						loc_ids.push(locId)
 
 						showTable()
 
 						var now        = (new Date().getTime());
 						var expiryTime = now + testTimePerLocation
-
-						// create a timer to show the remaining time at the current location and show an alert when time is up
-						timerId = setInterval(function(){ 
+						
+						// create a timer if the app is in RX to show the remaining time at the current location and show an alert when time is up
+						if (appInTx==false){
+							timerId = setInterval(function(){ 
 										now         = (new Date().getTime());
 										var msecRem = Math.floor((expiryTime - now))
 										if(msecRem <= 0) {
@@ -525,13 +565,14 @@
 										loc_button.value = `${minutes} mins ${seconds} secs `
 										timerRunning     = true
 								}, 1000);
+						}
 
 						var m = {
 									'marker' : new Object(),
 									'overlay': new Object()
 								}
 
-						var overlayContent = `<div class="overlay">RX ${rxId} LOC${locId}</div>`
+						var overlayContent = appInTx?`<div class="overlay">TX ${txId} LOC${locId}</div>`:`<div class="overlay">RX ${rxId} LOC${locId}</div>`
 						var titleContent   = `RX ${rxId} LOC${locId}`
 
 						mapObj.setCenter(lat, lon);
