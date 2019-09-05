@@ -38,7 +38,7 @@
 			margin-top: 15px;
 		}
 		.hidden{
-			isplay:none;
+			display:none;
 		}
 		.center {
 			text-align: center;
@@ -293,7 +293,7 @@
 			testTime              = (11 * 45); //timeslotduration * number of channels
 			var timerId           = 0
 			var timerRunning      = false;
-			var appInTx           = true
+			var appInTx           = false
 			var lastrxId          = ""
 			var lasttestRuns      = ""
 			var testCompleteAudio = new Audio("./completed.mp3")
@@ -546,6 +546,7 @@
 						var expiryTime = now + testTimePerLocation
 						
 						// create a timer if the app is in RX to show the remaining time at the current location and show an alert when time is up
+						console.log(appInTx)
 						if (appInTx==false){
 							timerId = setInterval(function(){ 
 										now         = (new Date().getTime());
