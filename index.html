@@ -578,6 +578,16 @@
 
 						mapObj.setCenter(lat, lon);
 						mapObj.setZoom(16);
+						markerColor = appInTx ? "#00CED1" : '#FF5252';
+						markerPath = appInTx? "M 0 0 L -5 -10 A 7 7 0 1 1 5 -10 Z" : 'M 0 0 L -5 -10 A 7 7 0 1 1 5 -10 z M -1 -15 H 1 V-13 H-1 V -15 Z'
+						sourceIcon = {
+							     path: markerPath,
+							     fillColor: markerColor,
+							     fillOpacity: 0.8,
+							     scale: 1,
+							     strokeColor: 'black',
+							     strokeWeight: 1
+							},
 
 						m.marker = mapObj.addMarker({
 							lat      : lat,
@@ -641,7 +651,7 @@
 									  lat           : lat,
 									  lng           : lon,
 									  content       : overlayContent,
-									  verticalOffset: -40
+									  verticalOffset: -30
 						});                       
 
 						//update the location id to new non existing value
