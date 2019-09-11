@@ -510,6 +510,9 @@
 				  if (res){
 					resetTimer(timerId)
 					alert("Current timer Aborted. Test Incomplete. You may have to delete the last entry.")
+					document.getElementById("locationId").disabled = false
+					document.getElementById("rxId").disabled       = false
+					document.getElementById("testRuns").disabled   = false
 				  }
 				  return
 				}
@@ -583,6 +586,10 @@
 										loc_button.value = `${minutes} mins ${seconds} secs `
 										timerRunning     = true
 								}, 1000);
+							// disable the inputs
+							document.getElementById("locationId").disabled = true;
+							document.getElementById("rxId").disabled       = true;
+							document.getElementById("testRuns").disabled   = true;
 						}
 
 						var m = {
