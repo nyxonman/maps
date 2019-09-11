@@ -489,6 +489,9 @@
 				clearInterval(timerId)
 				timerRunning = false
 				loc_button.value = "Start at your location"
+				document.getElementById("locationId").disabled = false;
+				document.getElementById("rxId").disabled       = false;
+				document.getElementById("testRuns").disabled   = false;
 			}
 		  
 			loc_button.onclick = function(e){
