@@ -484,14 +484,15 @@
 			}
 
 			function resetTimer(timerId){
+				document.getElementById("locationId").disabled = false
+				document.getElementById("rxId").disabled       = false
+				document.getElementById("testRuns").disabled   = false
 				loc_button.classList.remove('testStarted')
 				loc_button.classList.add('testNotStarted')
 				clearInterval(timerId)
 				timerRunning = false
 				loc_button.value = "Start at your location"
-				document.getElementById("locationId").disabled = false;
-				document.getElementById("rxId").disabled       = false;
-				document.getElementById("testRuns").disabled   = false;
+
 			}
 		  
 			loc_button.onclick = function(e){
@@ -513,9 +514,7 @@
 				  if (res){
 					resetTimer(timerId)
 					alert("Current timer Aborted. Test Incomplete. You may have to delete the last entry.")
-					document.getElementById("locationId").disabled = false
-					document.getElementById("rxId").disabled       = false
-					document.getElementById("testRuns").disabled   = false
+					
 				  }
 				  return
 				}
@@ -571,6 +570,10 @@
 						
 						// create a timer if the app is in RX to show the remaining time at the current location and show an alert when time is up
 						if (appInTx==false){
+							// disable the inputs
+							document.getElementById("locationId").disabled = true;
+							document.getElementById("rxId").disabled       = true;
+							document.getElementById("testRuns").disabled   = true;
 							timerId = setInterval(function(){ 
 										now         = (new Date().getTime());
 										var msecRem = Math.floor((expiryTime - now))
@@ -589,10 +592,7 @@
 										loc_button.value = `${minutes} mins ${seconds} secs `
 										timerRunning     = true
 								}, 1000);
-							// disable the inputs
-							document.getElementById("locationId").disabled = true;
-							document.getElementById("rxId").disabled       = true;
-							document.getElementById("testRuns").disabled   = true;
+							
 						}
 
 						var m = {
