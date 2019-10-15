@@ -584,6 +584,8 @@
 				  return
 				}
 
+				devId = appInTx? txId : rxId;
+
 				// get the geo location and handle the succes, failure
 				navigator.geolocation.getCurrentPosition(
 					
@@ -645,9 +647,9 @@
 									'overlay': new Object()
 								}
 
-						var titleContent   = `RX ${rxId} LOC${locId}`
+						var titleContent   = `DEV ${devId} LOC${locId}`
 						// create the popup html
-					    popupHtml=`<div class="popUpContent"><h4>DEV ${rxId} LOC ${locId} </h4><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div></div>`
+					    popupHtml=`<div class="popUpContent"><h4>DEV ${devId} LOC ${locId} </h4><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div></div>`
 
 					    var div = window.document.createElement('div');
 						div.innerHTML = popupHtml;
@@ -696,9 +698,9 @@
 							var lon = lngLat.lng;
 
 							var tmpLoc = parseInt(e.target._popup._content.textContent.split(" ")[3])
-							var tmpRx = parseInt(e.target._popup._content.textContent.split(" ")[1])
+							var tmpDev = parseInt(e.target._popup._content.textContent.split(" ")[1])
 
-							popupHtml=`<div class="popUpContent"><h4>DEV ${tmpRx} LOC ${tmpLoc} </h4><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div></div>`
+							popupHtml=`<div class="popUpContent"><h4>DEV ${tmpDev} LOC ${tmpLoc} </h4><div>${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}</div></div>`
 
 							var index          = get_index_from_loc_for_loc_data(tmpLoc)
 							this.getPopup().setHTML(popupHtml)
