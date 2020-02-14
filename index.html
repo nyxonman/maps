@@ -314,7 +314,9 @@
 			loc_ids               = [];
 			u_ids                 = []; // txid-rxid-locid
 			fields                = ["U_ID", "Loc_id", "Tx_id", "Rx_id", "StartTime", "Latitude", "Longitude",  "Accuracy", "Altitude", "Test_reps" ,"EntryFor", "Action"];
-			testTime              = (7 * 60); //timeslotduration * number of channels
+			timeslotduration      = 60
+			nbr_channels          = 7
+			testTime              = (nbr_channels * timeslotduration); //timeslotduration * number of channels
 			var timerId           = 0;
 			var timerRunning      = false;
 			var appInTx           = false;
@@ -446,7 +448,8 @@
 				});
 				var encodedUri = encodeURI(csvContent);
 				var link       = document.createElement("a");
-				var filename   = `${rxId}_loc_time.csv`
+				var now        = new Date().toLocaleString();
+				var filename   = `${rxId}_loc_time_` + `${now}` + `.csv`
 				link.setAttribute("href", encodedUri);
 				link.setAttribute("download", filename);
 				document.body.appendChild(link); // Required for FF
@@ -560,7 +563,7 @@
 				lasttestRuns = testRuns
 				uId          = txId + "-" + rxId + "-" + locId // globally unique identification
 				var testTimePerLocation = testRuns? testTime * testRuns : testTime
-				testTimePerLocation = (45 + testTimePerLocation + 10)*1000 // (first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
+				testTimePerLocation = (timeslotduration + testTimePerLocation + 10)*1000 // (first timeslot + (timeslot * channels) * repetitions  + 10 sec final) *1000 msec
 				/*In case the timer is running and the button is pressed, simply just stop the timer*/
 				if(timerRunning){
 				  var res = confirm("Timer Running. Do you want to abort?")
